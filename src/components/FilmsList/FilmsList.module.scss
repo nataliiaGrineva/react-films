@@ -1,0 +1,16 @@
+.film_container {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.list_item {
+    border: solid 2px darkgray;
+    border-radius: 10px;
+    margin: 10px;
+    background-color: lightgrey;
+    overflow: hidden;
+    padding: 10px;
+}

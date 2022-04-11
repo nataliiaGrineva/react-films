@@ -1,11 +1,11 @@
-import Counter from './components/Counter';
 import './App.scss';
+import React from 'react';
+import MainRouter from './Routes/MainRouter';
+
 
 function App() {
   return (
-    <div className="App">
-      <Counter />      
-    </div>
+    <MainRouter />
   );
 }
 
