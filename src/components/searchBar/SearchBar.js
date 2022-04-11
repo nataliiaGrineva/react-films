@@ -8,25 +8,21 @@ import styles from './SearchBar.module.scss';
 const SearchBar = () => {
     const dispatch = useDispatch();
 
-    const { title, year } = useSelector(store => store);
+    const { title, year, isLoading } = useSelector(store => store);
 
     const [ searchQuery, setSearchQuery ] = useState(title);
     const [ searchYear, setSearchYear ] = useState(year);
     const [ emptyQuery, setEmptyQuery ] = useState(false);
     const [ queries, setQueries]  = useState([]);
-    const [ years, setYears ] = useState([]);
     const [ showDropdown, setShowDropdown ] = useState(false);
-    const [ showYearsDropdown, setYearsShowDropdown ] = useState(false);
 
     useEffect(() => {
         const localQueries = JSON.parse(localStorage.getItem('QUERIES'));
         if (localQueries) {
             setQueries(localQueries);
         };
-
-        const localYears = JSON.parse(localStorage.getItem('YEARS'));
-        if (localYears) {
-            setYears(localYears);
+        if (isLoading) {
+            dispatch(setLoading(false));
         }
       }, []);
    
@@ -43,10 +39,6 @@ const SearchBar = () => {
 
     const changeYear = (e) => {
         setSearchYear(e.target.value);
-
-        if (!showYearsDropdown) {
-            setYearsShowDropdown(true);
-        }
     };
 
     const searchFilms = async (e) => {
@@ -58,25 +50,22 @@ const SearchBar = () => {
 
             dispatch(setTitle(searchQuery));
             dispatch(setYear(searchYear));
+          
 
-            if (!queries.includes(searchQuery)) {
-                const newQueries = [...queries, searchQuery];
+            if (!queries.includes(searchQuery.toLowerCase())) {
+                const newQueries = [...queries, searchQuery.toLowerCase()];
                 setQueries(newQueries);
                 localStorage.setItem('QUERIES', JSON.stringify(newQueries));
-            }
-
-            if (searchYear && !years.includes(searchYear)) {
-                const newYears = [...years, searchYear];
-                setYears(newYears);
-                localStorage.setItem('YEARS', JSON.stringify(newYears));
             }
         } else {
             setEmptyQuery(true);
         };
     };
 
-    const suggestions = queries.filter(item => item.toLowerCase().includes(searchQuery.toLowerCase()));
-    if (showDropdown && suggestions.length === 1 && suggestions.includes(searchQuery)) {
+    const suggestions = queries.filter(
+        item => item.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    if (showDropdown && suggestions.length === 1 && suggestions.includes(searchQuery.toLowerCase())) {
         setShowDropdown(false);
     };
 
@@ -97,13 +86,13 @@ const SearchBar = () => {
                         className={`${styles.input} ${emptyQuery&&styles.input__red}`}
                     />
                 </label>
-                <Suggester
+                { !isLoading && <Suggester
                     suggestions={suggestions}
                     showDropdown={showDropdown}
                     setShowDropdown={setShowDropdown}
                     setSearchQuery={setSearchQuery}
                     setEmptyQuery={setEmptyQuery}
-                />
+                />}
 
                 <div className={styles.alert}>
                 {emptyQuery && <span>* TITLE is required</span>}
